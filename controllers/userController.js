@@ -14,4 +14,14 @@ const getUsers = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { getUsers };
+// @desc    Get logged in user (self)
+// @route   GET /api/v1/self
+// @access  Private
+const getSelf = catchAsync(async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+});
+
+module.exports = { getUsers, getSelf };

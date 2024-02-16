@@ -1,7 +1,12 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
+
+app.use(
+  cors({ origin: [process.env.FRONTEND_URI, process.env.LIVE_FRONTEND_URI] })
+);
 
 const connectDb = require("./utils/connectDb");
 connectDb();
@@ -13,6 +18,7 @@ const userRoutes = require("./routes/userRoutes");
 const PORT = process.env.PORT || 8002;
 
 app.use(express.json());
+app.use(express.urlencoded());
 
 app.get("/", (req, res) => res.send("Moviestry"));
 

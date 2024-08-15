@@ -13,6 +13,11 @@ const signUp = catchAsync(async (req, res, next) => {
     throw new Error("All fields are required");
   }
 
+  if (password.length < 8) {
+    res.status(400);
+    throw new Error("Minimum password length should be 8 characters");
+  }
+
   // check if user exists in the db
   const isUserExists = await UserModel.findOne({ email });
 

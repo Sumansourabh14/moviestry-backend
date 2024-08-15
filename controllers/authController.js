@@ -16,6 +16,11 @@ const login = catchAsync(async (req, res, next) => {
 
   const user = await UserModel.findOne({ email });
 
+  if (!user) {
+    res.status(401);
+    throw new Error("Incorrect email or password");
+  }
+
   if (user && (await bcrypt.compare(password, user.password))) {
     const accessToken = generateToken(user._id);
 
@@ -26,9 +31,6 @@ const login = catchAsync(async (req, res, next) => {
       email: user.email,
       token: accessToken,
     });
-  } else {
-    res.status(401);
-    throw new Error("Invalid credentials");
   }
 });
 

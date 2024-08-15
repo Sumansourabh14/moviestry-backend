@@ -11,6 +11,11 @@ const authMiddleware = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
 
+    if (token === "undefined") {
+      res.status(400);
+      throw new Error("No token provided");
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = await UserModel.findById(decoded.id).select("-password");

@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
+    watchlist: {
+      type: Array,
+      default: [],
+    },
   },
   {
     timestamps: true,

@@ -14,6 +14,7 @@ connectDb();
 const errorHandler = require("./middlewares/errorMiddleware");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const movieRoutes = require("./routes/movieRoutes");
 
 const PORT = process.env.PORT || 8002;
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => res.send("Moviestry"));
 
 app.use("/api/v1", authRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/media", movieRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`listening on port ${PORT}!`));

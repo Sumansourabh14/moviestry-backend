@@ -60,4 +60,24 @@ const addToWatchlist = catchAsync(async (req, res, next) => {
     .json({ success: true, message: "Media added to watchlist", id });
 });
 
-module.exports = { addToWatchlist };
+// @desc    Get user's watchlist
+// @route   GET /api/v1/media/watchlist
+// @access  Private
+const getWatchlist = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+
+  // Populate the user's watchlist with movie details
+  const user = await UserModel.findById(userId).populate("watchlist");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    watchlist: user.watchlist,
+  });
+});
+
+module.exports = { addToWatchlist, getWatchlist };

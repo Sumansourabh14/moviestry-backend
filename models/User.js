@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
     watchlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Media",
+        ref: "media",
       },
     ],
   },

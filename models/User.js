@@ -11,10 +11,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
-    watchlist: {
-      type: Array,
-      default: [],
-    },
+    watchlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Media",
+      },
+    ],
   },
   {
     timestamps: true,

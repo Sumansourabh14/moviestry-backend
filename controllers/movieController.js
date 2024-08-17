@@ -1,11 +1,24 @@
 const catchAsync = require("express-async-handler");
 const UserModel = require("../models/User");
+const MediaModel = require("../models/Media");
 
 // @desc    Add to watchlist
 // @route   POST /api/v1/media/watchlist/:id
 // @access  Private
 const addToWatchlist = catchAsync(async (req, res, next) => {
   const { id } = req.params;
+  const {
+    adult,
+    backdrop_path,
+    genre_ids,
+    mediaId,
+    original_language,
+    original_title,
+    overview,
+    poster_path,
+    release_date,
+    title,
+  } = req.body;
   const userId = req.user._id;
 
   const user = await UserModel.findById(userId);
@@ -15,13 +28,31 @@ const addToWatchlist = catchAsync(async (req, res, next) => {
     throw new Error("User not found");
   }
 
+  let media = await MediaModel.findOne({ mediaId });
+
+  if (!media) {
+    media = await MediaModel.create({
+      adult,
+      backdrop_path,
+      genre_ids,
+      mediaId,
+      original_language,
+      original_title,
+      overview,
+      poster_path,
+      release_date,
+      title,
+    });
+  }
+
+  const mediaIdInDb = media._id;
   // Check if movie is already in watchlist
-  if (user.watchlist.includes(id)) {
+  if (user.watchlist.includes(mediaIdInDb)) {
     res.status(400);
     throw new Error("This media is already in watchlist");
   }
 
-  user.watchlist.push(id);
+  user.watchlist.push(mediaIdInDb);
   await user.save();
 
   res

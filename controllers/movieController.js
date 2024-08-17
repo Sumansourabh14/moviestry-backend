@@ -80,4 +80,38 @@ const getWatchlist = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { addToWatchlist, getWatchlist };
+// @desc    Remove from watchlist
+// @route   DELETE /api/v1/media/watchlist/:id
+// @access  Private
+const removeFromWatchlist = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user._id;
+
+  const user = await UserModel.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  let media = await MediaModel.findOne({ mediaId: id });
+
+  if (!media) {
+    res.status(404);
+    throw new Error("Media not found");
+  }
+
+  // Check if movie is in watchlist
+  if (user.watchlist.includes(media._id)) {
+    await UserModel.updateOne(
+      { _id: userId },
+      { $pull: { watchlist: media._id } }
+    );
+  }
+
+  res
+    .status(201)
+    .json({ success: true, message: "Media removed from watchlist", id });
+});
+
+module.exports = { addToWatchlist, getWatchlist, removeFromWatchlist };

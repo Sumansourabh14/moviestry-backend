@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema(
         ref: "media",
       },
     ],
+    watched: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "media",
+      },
+    ],
   },
   {
     timestamps: true,

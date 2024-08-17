@@ -114,4 +114,123 @@ const removeFromWatchlist = catchAsync(async (req, res, next) => {
     .json({ success: true, message: "Media removed from watchlist", id });
 });
 
-module.exports = { addToWatchlist, getWatchlist, removeFromWatchlist };
+// @desc    Add to watched
+// @route   POST /api/v1/media/watched/:id
+// @access  Private
+const addToWatched = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const {
+    adult,
+    backdrop_path,
+    genre_ids,
+    mediaId,
+    original_language,
+    original_title,
+    overview,
+    poster_path,
+    release_date,
+    title,
+  } = req.body;
+  const userId = req.user._id;
+
+  const user = await UserModel.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  let media = await MediaModel.findOne({ mediaId });
+
+  if (!media) {
+    media = await MediaModel.create({
+      adult,
+      backdrop_path,
+      genre_ids,
+      mediaId,
+      original_language,
+      original_title,
+      overview,
+      poster_path,
+      release_date,
+      title,
+    });
+  }
+
+  const mediaIdInDb = media._id;
+  // Check if movie is already in watchlist
+  if (user.watched.includes(mediaIdInDb)) {
+    res.status(400);
+    throw new Error("This media is already in watched");
+  }
+
+  await UserModel.updateOne({ _id: userId }, { $push: { watched: media._id } });
+
+  res
+    .status(201)
+    .json({ success: true, message: "Media added to watched", id });
+});
+
+// @desc    Remove from watched
+// @route   DELETE /api/v1/media/watched/:id
+// @access  Private
+const removeFromWatched = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user._id;
+
+  const user = await UserModel.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  let media = await MediaModel.findOne({ mediaId: id });
+
+  if (!media) {
+    res.status(404);
+    throw new Error("Media not found");
+  }
+
+  // Check if movie is in watched
+  if (user.watched.includes(media._id)) {
+    await UserModel.updateOne(
+      { _id: userId },
+      { $pull: { watched: media._id } }
+    );
+  }
+
+  res
+    .status(201)
+    .json({ success: true, message: "Media removed from watched", id });
+});
+
+// @desc    Get user's watched list
+// @route   GET /api/v1/media/watched
+// @access  Private
+const getWatched = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+
+  // Populate the user's watched with movie details
+  const user = await UserModel.findById(userId).populate("watched");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    watched: user.watched,
+    total: user.watched.length,
+  });
+});
+
+module.exports = {
+  addToWatchlist,
+  getWatchlist,
+  removeFromWatchlist,
+  addToWatched,
+  removeFromWatched,
+  getWatched,
+};

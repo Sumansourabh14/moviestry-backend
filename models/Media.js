@@ -33,6 +33,9 @@ const mediaSchema = new mongoose.Schema(
     adult: {
       type: Boolean,
     },
+    runtime: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

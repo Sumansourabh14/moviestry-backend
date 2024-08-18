@@ -18,6 +18,7 @@ const addToWatchlist = catchAsync(async (req, res, next) => {
     poster_path,
     release_date,
     title,
+    runtime,
   } = req.body;
   const userId = req.user._id;
 
@@ -42,6 +43,7 @@ const addToWatchlist = catchAsync(async (req, res, next) => {
       poster_path,
       release_date,
       title,
+      runtime,
     });
   }
 
@@ -130,6 +132,7 @@ const addToWatched = catchAsync(async (req, res, next) => {
     poster_path,
     release_date,
     title,
+    runtime,
   } = req.body;
   const userId = req.user._id;
 
@@ -154,6 +157,7 @@ const addToWatched = catchAsync(async (req, res, next) => {
       poster_path,
       release_date,
       title,
+      runtime,
     });
   }
 

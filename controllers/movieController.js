@@ -130,6 +130,7 @@ const addToWatched = catchAsync(async (req, res, next) => {
     poster_path,
     release_date,
     title,
+    runtime,
   } = req.body;
   const userId = req.user._id;
 
@@ -154,6 +155,7 @@ const addToWatched = catchAsync(async (req, res, next) => {
       poster_path,
       release_date,
       title,
+      runtime,
     });
   }
 
@@ -226,6 +228,88 @@ const getWatched = catchAsync(async (req, res, next) => {
   });
 });
 
+// @desc    Get user's watched list
+// @route   GET /api/v1/media/watched
+// @access  Private
+const getWatchedHours = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+
+  // Populate the user's watched with movie details
+  const user = await UserModel.findById(userId).populate("watched");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  let sum = 0;
+  for (let i = 0; i < user.watched.length; i++) {
+    sum = sum + user.watched[i].runtime;
+  }
+
+  res.status(200).json({
+    success: true,
+    totalHours: sum,
+    totalMovies: user.watched.length,
+  });
+});
+
+const getMaxWatchedHours = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+
+  // Populate the user's watched with movie details
+  const user = await UserModel.findById(userId).populate("watched");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  let max = user.watched[0].runtime;
+  let maxMovie = user.watched[0];
+  for (let i = 0; i < user.watched.length; i++) {
+    if (max < user.watched[i].runtime) {
+      max = user.watched[i].runtime;
+      maxMovie = user.watched[i];
+    }
+  }
+
+  res.status(200).json({
+    success: true,
+    maxHours: max,
+    movie: maxMovie,
+    totalMovies: user.watched.length,
+  });
+});
+
+const getMinimumWatchedHours = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+
+  // Populate the user's watched with movie details
+  const user = await UserModel.findById(userId).populate("watched");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  let min = user.watched[0].runtime;
+  let minMovie = user.watched[0];
+  for (let i = 0; i < user.watched.length; i++) {
+    if (min > user.watched[i].runtime) {
+      min = user.watched[i].runtime;
+      minMovie = user.watched[i];
+    }
+  }
+
+  res.status(200).json({
+    success: true,
+    minHours: min,
+    movie: minMovie,
+    totalMovies: user.watched.length,
+  });
+});
+
 module.exports = {
   addToWatchlist,
   getWatchlist,
@@ -233,4 +317,7 @@ module.exports = {
   addToWatched,
   removeFromWatched,
   getWatched,
+  getWatchedHours,
+  getMaxWatchedHours,
+  getMinimumWatchedHours,
 };

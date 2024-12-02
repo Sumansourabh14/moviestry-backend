@@ -9,6 +9,7 @@ const {
   getWatchedHours,
   getMaxWatchedHours,
   getMinimumWatchedHours,
+  getWatchedPublic,
 } = require("../controllers/movieController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -25,5 +26,8 @@ router.get("/total-watch-time", authMiddleware, getWatchedHours);
 router.get("/max-watch-time", authMiddleware, getMaxWatchedHours);
 router.get("/min-watch-time", authMiddleware, getMinimumWatchedHours);
 router.delete("/watched/:id", authMiddleware, removeFromWatched);
+
+// public watched
+router.get("/:id/watched", getWatchedPublic);
 
 module.exports = router;

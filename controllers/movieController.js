@@ -207,11 +207,32 @@ const removeFromWatched = catchAsync(async (req, res, next) => {
     .json({ success: true, message: "Media removed from watched", id });
 });
 
-// @desc    Get user's watched list
+// @desc    Get logged in user's watched list
 // @route   GET /api/v1/media/watched
 // @access  Private
 const getWatched = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
+
+  // Populate the user's watched with movie details
+  const user = await UserModel.findById(userId).populate("watched");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    watched: user.watched,
+    total: user.watched.length,
+  });
+});
+
+// @desc    Get user's already watched list
+// @route   GET /api/v1/media/watched
+// @access  Public
+const getWatchedPublic = catchAsync(async (req, res, next) => {
+  const userId = req.params.id;
 
   // Populate the user's watched with movie details
   const user = await UserModel.findById(userId).populate("watched");
@@ -320,4 +341,5 @@ module.exports = {
   getWatchedHours,
   getMaxWatchedHours,
   getMinimumWatchedHours,
+  getWatchedPublic,
 };
